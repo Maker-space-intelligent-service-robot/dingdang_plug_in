@@ -3,7 +3,7 @@
 # 安装
 ```
 cd /home/pi/.dingdang
-git clone ... contrib
+git clone git@github.com:Maker-space-intelligent-service-robot/dingdang_plug_in.git contrib
 pip install -r contrib/requirements.txt
 ```
 # 升级
