@@ -1,4 +1,4 @@
-## -*- coding: utf-8-*-
+# -*- coding: utf-8-*-
 # 这是语音开门插件，当语音命令说出“芝麻开门”时，通过MQTT发送命令到8266上面，实现开门
 # 
 # WORDS是一个关键词列表，用户存储这个插件的指令关键词（的拼音）
@@ -10,6 +10,7 @@ import paho.mqtt.publish as publish
 import paho.mqtt.client as client
 import sys 
 import logging
+import json
 
 reload(sys)
 sys.setdefaultencoding('utf8')
@@ -28,22 +29,18 @@ def isValid(text):
 #   topic_p：'订阅的主题'
 #   message: '发送的消息'
 
-SLUG = 'open'
+SLUG = "open"
 
 # mic是麦克风和喇叭模块，通过调用mic.say()函数来让喇叭说话
 # profile是用户配置信息，它是一个字典，记录了 ~/.dingdang/profile.yml 的全部内容；
-def handle(text,mic,proflie):
-    if(SLUG not in proflie ) \
-    or (not proflie[SLUG].has_key('host')) \
-    or (not proflie[SLUG].has_key('port')) \    
-    or (not proflie[SLUG].has_key('topic_p')) \
-    or (not proflie[SLUG].has_key('message')):
+def handle(text,mic,profile,wxbot=None):
+    if(SLUG not in profile ) or ('host'not in profile[SLUG]) or ('port' not in profile[SLUG]) or ('topic_p' not in profile[SLUG]) or ('message' not in profile[SLUG]):
         mic.say("配置有误",cache=True)
         return
-    host = proflie[SLUG]['host']
-    port = proflie[SLUG]['port']    
-    topic_p = proflie[SLUG]['topic_p']
-    msg = proflie[SLUG][message]
+    host = profile[SLUG]['host']
+    port = profile[SLUG]['port']    
+    topic_p = profile[SLUG]['topic_p']
+    msg = profile[SLUG]['message']
 # 因为是偶尔需要发布消息，所以不需要mqtt broker 保持连线，这里采用single方法
 # public a message then disconnect
 
