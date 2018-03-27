@@ -51,7 +51,7 @@ def connectPostgreSQL(database,user,pw,host,port,tool):
 		mic.say("数据库连接失败，请稍后再试")
 	cursor = conn.cursor()
 	# 这里是数据库查询语句????
-	cursor.execute("")
+	cursor.execute("select roomid,goodstore from goods where goodsname=%s",tool)
 	row = cursor.fetchall()
 	room = row[0]
 	location = row[1]
