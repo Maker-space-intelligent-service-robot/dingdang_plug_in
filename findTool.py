@@ -14,9 +14,13 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf8')
 
-WORDS = ["ZAINALI"]
+WORDS = ["DUBANGXIAN"]
 SLUG = "findTool"
 
+def isValid(text):
+    # tool = get_tool(text)
+    
+    return any(word in text for word in [u"杜邦线"])
 #配置
 # findTool:
 #    host:''
@@ -36,26 +40,29 @@ def get_tool(text):
 	fjson = json.loads(f)
 	tool = None
 	for value in fjson.values():
-		if word in text for word in value:
-			tool = word
+		for word in text:
+                    if word in value:
+                        tool = word
+                        return tool
 	return tool
 
-def isValid(text):
-    tool = get_tool(text)
-	return tool!=None
 
-def connectPostgreSQL(database,user,pw,host,port,tool):
+
+def connectPostgreSQL(database,user,pw,host,port,tool,mic,logger):
 	try:
 		conn = psycopg2.connect(database=database,user = user,password=pw,host = host,port = port)
 	except:
 		mic.say("数据库连接失败，请稍后再试")
 	cursor = conn.cursor()
 	# 这里是数据库查询语句????
-	cursor.execute("select roomid,goodstore from goods where goodsname=%s",tool)
-	row = cursor.fetchall()
-	room = row[0]
-	location = row[1]
-	mic.say('%s 在房间 %s' % tool,room, cache=True)
+	cursor.execute("SELECT roomid,goodstore FROM goods WHERE goodsname= %s ;",(tool,))
+	rows = cursor.fetchall()
+	location='1'
+	for i in rows:
+            this.logger.error(i)
+            room = i[0]
+            this.location = i[1]
+	    this.mic.say("%s 在房间 %s" % tool,room, cache=True)
 	conn.close()
 	return location
 
@@ -73,18 +80,20 @@ def handle(text,mic,profile,wxbot=None):
 	user = profile[SLUG]['user']
 	pw = profile[SLUG]['pw']
 	# 获取命令中的工具
-	tool = get_tool(text)
+	tool = text
+	logger.error(type(tool))
+	# mic.say(type(tool),cache=True)
 	# 从数据库中查到该工具的位置
-	location = connectPostgreSQL(database,user,pw,dataHost,dataPort,tool)
+	station = connectPostgreSQL(database,user,pw,dataHost,dataPort,tool,mic,logger)
 	#消息的格式还需要调试,数字
-	msg=location
+	msg=station
 	try:
-        publish.single(topic,msg,qos=1,hostname=host,port=port)
+            publish.single(topic,msg,qos=1,hostname=host,port=port)
         # publish.single(topic_p,msg,qos = 1,hostname=host,port=port,auth=auth,client_id=client_id)
-        mic.say("灯光已提示",cache=True)
-    except Exception,e:
-        logger.error(e)
-        mic.say('抱歉，mqtt存在错误，指令不能发出')
+            mic.say("灯光已提示",cache=True)
+        except Exception,e:
+            logger.error(e)
+            mic.say('抱歉，mqtt存在错误，指令不能发出')
 	
 
 
