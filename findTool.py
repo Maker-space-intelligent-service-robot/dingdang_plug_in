@@ -20,7 +20,7 @@ SLUG = "findTool"
 def isValid(text):
     # tool = get_tool(text)
     
-    return any(word in text for word in [u"杜邦线"])
+    return any(word in text for word in [u"杜邦线",u"钳子"])
 #配置
 # findTool:
 #    host:''
@@ -55,14 +55,18 @@ def connectPostgreSQL(database,user,pw,host,port,tool,mic,logger):
 		mic.say("数据库连接失败，请稍后再试")
 	cursor = conn.cursor()
 	# 这里是数据库查询语句????
-	cursor.execute("SELECT roomid,goodstore FROM goods WHERE goodsname= %s ;",(tool,))
+	tool = tool.split("，")[0]
+	cursor.execute("SELECT roomid,goodlocation FROM goods WHERE goodsname= %s ;",(tool,))
+	#logger.error(tool)
 	rows = cursor.fetchall()
+	#logger.error(rows)
 	location='1'
 	for i in rows:
-            this.logger.error(i)
+            #logger.error(i)
             room = i[0]
-            this.location = i[1]
-	    this.mic.say("%s 在房间 %s" % tool,room, cache=True)
+            location = i[1]
+            responds = u'%s房间：' % room
+	    mic.say(responds, cache=True)
 	conn.close()
 	return location
 
@@ -85,6 +89,7 @@ def handle(text,mic,profile,wxbot=None):
 	# mic.say(type(tool),cache=True)
 	# 从数据库中查到该工具的位置
 	station = connectPostgreSQL(database,user,pw,dataHost,dataPort,tool,mic,logger)
+	logger.error(station)
 	#消息的格式还需要调试,数字
 	msg=station
 	try:
