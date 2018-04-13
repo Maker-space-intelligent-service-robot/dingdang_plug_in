@@ -59,9 +59,9 @@ def connectPostgreSQL(database,user,pw,host,port,tool,mic,logger):
 	rows = cursor.fetchall()
 	location='1'
 	for i in rows:
-            this.logger.error(i)
-            room = i[0]
-            this.location = i[1]
+        this.logger.error(i)
+        room = i[0]
+        this.location = i[1]
 	    this.mic.say("%s 在房间 %s" % tool,room, cache=True)
 	conn.close()
 	return location
